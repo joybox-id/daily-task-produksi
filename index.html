@@ -71,7 +71,9 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;back
 .wrap{max-width:600px;margin:0 auto;padding:16px 16px 110px}
 .wrap.wide{max-width:1180px;padding-bottom:60px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
-.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.head-stat{text-align:right;white-space:nowrap}
+@media (max-width:600px){.head-stat{text-align:left}}
 .card-head p{margin-top:3px}
 .section-title{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin:22px 2px 10px}
 
@@ -302,8 +304,52 @@ button.step-in:hover{background:var(--surface-2)}
 .chart .lbl{font-size:13px;fill:var(--ink);font-weight:700}
 .chart .hit{fill:transparent}
 .chart .hit.on{fill:rgba(30,27,22,.045)}
+.chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .dotm{stroke:#fff;stroke-width:2}
+.chart .dlbl{font-size:12px;font-weight:700;fill:var(--ink)}
+.tbl td.ot{background:var(--warn-soft)}
+.tbl td.ot b{color:var(--warn-ink)}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+#report-root{display:none}
+body.reporting{overflow:hidden}
+body.reporting #report-root{display:block;position:fixed;inset:0;overflow:auto;background:#e8e3da;z-index:95;padding-bottom:40px}
+.rep-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(232,227,218,.96);border-bottom:1px solid var(--line-2)}
+.rep-bar .grow{flex:1}
+.rep-page{background:#fff;max-width:1080px;margin:16px auto;padding:30px 34px;border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow-x:auto}
+.rep h1{font-size:20px;font-weight:800}
+.rep h2{font-size:14px;font-weight:800;margin:0 0 8px;letter-spacing:.01em}
+.rep h3{font-size:13px;font-weight:800;margin:0 0 6px}
+.rep-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
+.rep-sec{margin-bottom:22px}
+.rep .chart svg{width:100%;height:auto}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{font-size:11px;font-weight:700;color:var(--ink-2);text-align:left;padding:6px 8px;background:#f4f0e9;border-bottom:1px solid var(--line-2);vertical-align:bottom}
+.rtbl th.num,.rtbl td.num{text-align:right}
+.rtbl td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.rtbl td small{display:block;font-size:10px;color:var(--warn-ink);font-weight:700}
+.rtbl td.ot{background:var(--warn-soft)}
+.rtbl tr.tot td{font-weight:800;border-top:1.5px solid var(--ink-3)}
+.rtbl .good{color:var(--good-ink)} .rtbl .warn{color:var(--warn-ink)} .rtbl .crit{color:var(--crit-ink)}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}
+.rep-note{font-size:11px;color:var(--ink-3);margin-top:6px;line-height:1.45}
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:700px){.rep-grid{grid-template-columns:1fr}.rep-page{padding:18px 14px;margin:8px}}
+.rep-card{border:1px solid var(--line);border-radius:8px;padding:10px 12px;break-inside:avoid}
+.rep-foot{font-size:10px;color:var(--ink-3);text-align:right;margin-top:10px}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  html,body{background:#fff!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.reporting{overflow:visible}
+  body.reporting #app,body.reporting #modal-root,#tip,#toast{display:none!important}
+  body.reporting #report-root{position:static;overflow:visible;background:#fff;padding:0}
+  .rep-bar{display:none!important}
+  .rep-page{max-width:none;margin:0;padding:0;box-shadow:none;border-radius:0;overflow:visible}
+  .rep-sec{break-inside:avoid}
+  .rtbl tr{break-inside:avoid}
+  .rep-grid{grid-template-columns:1fr 1fr}
+}
 #tip{position:fixed;z-index:100;pointer-events:none;background:var(--ink);color:#fff;border-radius:12px;padding:10px 12px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:190px;opacity:0;transition:opacity .1s}
 #tip.on{opacity:1}
 #tip .tt{font-weight:800;margin-bottom:6px}
@@ -1000,6 +1046,7 @@ async function tabRingkasan(main) {
         <input type="date" value="${date}" data-chg="spv-date" aria-label="Pilih tanggal"><button type="button" class="icon-btn" data-act="day" data-d="1" aria-label="Hari berikutnya">${I.right}</button></div>
       ${!isToday ? '<button type="button" class="btn sm" data-act="day-today">Hari ini</button>' : ''}
       <button type="button" class="btn sm" data-act="refresh">Muat ulang</button>
+      <button type="button" class="btn sm" data-act="report-open">${I.dl} Cetak / PDF</button>
       <span class="seg-label">Dasar hitung</span>
       <div class="seg" role="group" aria-label="Dasar perhitungan">${['plan', 'real'].map(k => `<button type="button" data-act="basis" data-b="${k}" aria-pressed="${b === k}">${BASIS_LBL[k]}</button>`).join('')}</div>
     </div>
@@ -1114,6 +1161,10 @@ const SERIES = [['Waktu produktif', 'var(--s1)'], ['Tidak efektif', 'var(--s2)']
 const legendHtml = () => SERIES.map(([l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join('') + `<span><i style="background:none;border-top:1.5px solid var(--ink-2);border-radius:0;height:0;width:16px;vertical-align:3px"></i>Jam normal ${D.settings.jamNormal} j</span>`;
 
 /* ---------- 11. GRAFIK (SVG) ---------- */
+// warna tetap per karyawan (urutan akun dibuat), palet kategori 8 warna yang sudah divalidasi
+const EMP_COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'];
+function empColor(id) { const i = D.users.filter(u => u.role === 'karyawan').findIndex(u => u.id === id); return i >= 0 && i < EMP_COLORS.length ? EMP_COLORS[i] : '#8a8478'; }
+const empLegendHtml = lines => lines.map(l => `<span><i style="background:${l.color}"></i>${esc(l.label)}</span>`).join('') + `<span><i style="background:none;border-top:1.5px solid var(--ink-2);border-radius:0;height:0;width:16px;vertical-align:3px"></i>Jam normal ${D.settings.jamNormal} j</span>`;
 const CHARTS = new Map();
 function registerChart(el, fn) { CHARTS.set(el, fn); fn(); }
 window.addEventListener('resize', debounce(() => { for (const [el, fn] of CHARTS) { if (!document.body.contains(el)) CHARTS.delete(el); else fn(); } }, 150));
@@ -1148,8 +1199,41 @@ function drawStacked(el, days, { h = 240 } = {}) {
   bindTips(el, days.map(d => `<div class="tt">${esc(fmtDateMed(d.date))}</div>` + (d.ok ? SERIES.map(([l, c], k) => `<div class="tr"><span><i style="background:${c}"></i>${l}</span><b>${fmtDur(d.segs[k])}</b></div>`).join('')
     + `<div class="sep"></div><div class="tr"><span>Total</span><b>${fmtDur(d.total)}</b></div><div class="tr"><span>Estimasi lembur</span><b>${d.ot ? fmtDur(d.ot) : '0'}</b></div>` : '<div class="tr"><span>Tidak ada data</span></div>')));
 }
-function drawHBars(el, rows) {
-  const W = Math.max(300, Math.floor(el.clientWidth || 600)), rowH = 38, m = { l: 96, r: 64, t: 22, b: 26 };
+function drawMultiLine(el, lines, { h = 300, w } = {}) {
+  const n = lines.length ? lines[0].days.length : 0, direct = lines.length <= 4;
+  const W = w || Math.max(280, Math.floor(el.clientWidth || 600)), H = h, m = { l: 34, r: direct ? 84 : 12, t: 28, b: 26 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b, thr = Number(D.settings.jamNormal) || 8;
+  const { step, top } = niceTop(Math.max(thr + 1, ...lines.flatMap(l => l.days.map(d => d.total / 3600))));
+  const Y = v => m.t + ih - (v / top) * ih, band = iw / Math.max(1, n), X = i => m.l + band * i + band / 2, every = Math.max(1, Math.ceil(34 / band));
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik jam kerja semua karyawan per hari">`;
+  for (let v = 0; v <= top; v += step) { const y = Y(v); s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y}" y2="${y}" class="${v ? 'grid' : 'base'}"/><text x="${m.l - 7}" y="${y + 4}" class="tick" text-anchor="end">${v}</text>`; }
+  s += `<text x="${m.l - 7}" y="${m.t - 6}" class="tick" text-anchor="end">jam</text>`;
+  for (let i = 0; i < n; i++) {
+    s += `<rect class="hit" x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}" data-i="${i}"/>`;
+    if ((n - 1 - i) % every === 0) s += `<text x="${X(i)}" y="${H - 8}" class="tick" text-anchor="middle">${lines[0].days[i].label}</text>`;
+  }
+  const ty = Y(thr);
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${ty}" y2="${ty}" class="thr" pointer-events="none"/><text x="${m.l + 4}" y="${ty - 5}" class="thr-lbl" pointer-events="none">Normal ${thr} j</text>`;
+  lines.forEach(l => { let d = '', pen = false;
+    l.days.forEach((dd, i) => { if (!dd.ok) { pen = false; return; } d += `${pen ? 'L' : 'M'}${X(i).toFixed(1)},${Y(dd.total / 3600).toFixed(1)}`; pen = true; });
+    if (d) s += `<path d="${d}" class="ln" stroke="${l.color}" pointer-events="none"/>`; });
+  lines.forEach(l => l.days.forEach((dd, i) => { if (dd.ok) s += `<circle cx="${X(i).toFixed(1)}" cy="${Y(dd.total / 3600).toFixed(1)}" r="4" fill="${l.color}" class="dotm" pointer-events="none"/>`; }));
+  if (direct) {
+    const labs = lines.map(l => { let i = -1; l.days.forEach((dd, k) => { if (dd.ok) i = k; }); return i < 0 ? null : { y: Y(l.days[i].total / 3600), label: l.label, color: l.color }; })
+      .filter(Boolean).sort((a, b) => a.y - b.y);
+    for (let k = 1; k < labs.length; k++) if (labs[k].y - labs[k - 1].y < 15) labs[k].y = labs[k - 1].y + 15;
+    labs.forEach(L => { s += `<rect x="${W - m.r + 8}" y="${L.y - 4}" width="8" height="8" rx="2" fill="${L.color}" pointer-events="none"/><text x="${W - m.r + 21}" y="${L.y + 4}" class="dlbl" pointer-events="none">${esc(L.label)}</text>`; });
+  }
+  s += '</svg>';
+  el.innerHTML = s;
+  bindTips(el, Array.from({ length: n }, (_, i) => {
+    const rows = lines.map(l => ({ l, d: l.days[i] })).sort((a, b) => (b.d.ok ? b.d.total : -1) - (a.d.ok ? a.d.total : -1));
+    return `<div class="tt">${esc(fmtDateMed(lines[0].days[i].date))}</div>` + rows.map(({ l, d }) =>
+      `<div class="tr"><span><i style="background:${l.color}"></i>${esc(l.label)}</span><b>${d.ok ? fmtDur(d.total) + (d.ot ? ' · lembur ' + fmtDur(d.ot) : '') : '–'}</b></div>`).join('');
+  }));
+}
+function drawHBars(el, rows, { w } = {}) {
+  const W = w || Math.max(300, Math.floor(el.clientWidth || 600)), rowH = 38, m = { l: 96, r: 64, t: 22, b: 26 };
   const H = m.t + rows.length * rowH + m.b, iw = W - m.l - m.r, thr = Number(D.settings.jamNormal) || 8;
   const { step, top } = niceTop(Math.max(thr + 1, ...rows.map(r => r.value / 3600)));
   const X = v => m.l + (v / top) * iw;
@@ -1159,7 +1243,7 @@ function drawHBars(el, rows) {
     const y = m.t + i * rowH, bh = 20, by = y + (rowH - bh) / 2, w = Math.max(0, X(r.value / 3600) - m.l);
     s += `<rect class="hit" x="0" y="${y}" width="${W}" height="${rowH}" data-i="${i}"/>`;
     s += `<text x="${m.l - 10}" y="${y + rowH / 2 + 4}" class="lbl" text-anchor="end" pointer-events="none">${esc(r.label)}</text>`;
-    if (r.value > 0) { s += `<path d="${rightRound(m.l, by, w, bh, 4)}" fill="var(--s1)" pointer-events="none"/><text x="${m.l + w + 8}" y="${y + rowH / 2 + 4}" class="val" pointer-events="none">${fmtH(r.value)}</text>`; }
+    if (r.value > 0) { s += `<path d="${rightRound(m.l, by, w, bh, 4)}" fill="${r.color || 'var(--s1)'}" pointer-events="none"/><text x="${m.l + w + 8}" y="${y + rowH / 2 + 4}" class="val" pointer-events="none">${fmtH(r.value)}</text>`; }
     else s += `<text x="${m.l + 6}" y="${y + rowH / 2 + 4}" class="tick" pointer-events="none">belum ada data</text>`;
   });
   const tx = X(thr);
@@ -1186,44 +1270,67 @@ document.addEventListener('scroll', hideTip, { passive: true });
 // --- tab grafik
 async function tabGrafik(main) {
   const emps = karyawanList(), g = S.spv.g;
-  if (!g.uid || !emps.some(u => u.id === g.uid)) g.uid = emps[0]?.id || null;
+  if (!g.uid || (g.uid !== 'all' && !emps.some(u => u.id === g.uid))) g.uid = 'all';
   if (!emps.length) { main.innerHTML = '<div class="card empty">Belum ada akun karyawan.</div>'; return; }
   const end = todayStr();
   main.innerHTML = '<div class="card empty">Memuat data…</div>';
   let rm; try { rm = await withTimeout(rangeMap(addDays(end, -(g.range - 1)), end), 40000); } catch (err) { rm = null; }
   if (!rm) { main.innerHTML = `<div class="card empty">Data belum bisa dijangkau. Cek koneksi lalu <button type="button" class="link" data-act="refresh">muat ulang</button>.</div>`; return; }
-  const sel = seriesFrom(rm, g.uid, end, g.range, g.basis);
+  const isAll = g.uid === 'all';
   const all = emps.map(u => seriesFrom(rm, u.id, end, g.range, g.basis));
-  const cmp = emps.map((u, i) => { const ds = all[i].filter(d => d.ok); return { label: firstName(u.nama), value: ds.length ? ds.reduce((a, d) => a + d.total, 0) / ds.length : 0, days: ds.length, otDays: ds.filter(d => d.ot > 0).length, ot: ds.reduce((a, d) => a + d.ot, 0) }; });
-  const selU = userById(g.uid), okDays = sel.filter(d => d.ok);
+  const sel = isAll ? all[0] : seriesFrom(rm, g.uid, end, g.range, g.basis);
+  const lines = emps.map((u, i) => ({ id: u.id, label: firstName(u.nama), color: empColor(u.id), days: all[i] }));
+  const cmp = emps.map((u, i) => { const ds = all[i].filter(d => d.ok); return { color: empColor(u.id), label: firstName(u.nama), value: ds.length ? ds.reduce((a, d) => a + d.total, 0) / ds.length : 0, days: ds.length, otDays: ds.filter(d => d.ot > 0).length, ot: ds.reduce((a, d) => a + d.ot, 0) }; });
+  const selU = isAll ? { nama: 'Semua karyawan' } : userById(g.uid), okDays = sel.filter(d => d.ok);
+  const allOk = all.flat().filter(d => d.ok), allAvg = allOk.length ? allOk.reduce((a, d) => a + d.total, 0) / allOk.length : 0;
   const sum = k => okDays.reduce((a, d) => a + (k === 'ot' ? d.ot : k === 'total' ? d.total : d.segs[k]), 0);
-  main.innerHTML = `<div class="toolbar">
-      <div class="datelabel">Grafik jam kerja</div>
-      <label class="seg-label" for="g-uid">Karyawan</label><select id="g-uid" class="inp sm" style="width:auto" data-chg="g-uid">${emps.map(u => `<option value="${u.id}" ${u.id === g.uid ? 'selected' : ''}>${esc(u.nama)}</option>`).join('')}</select>
-      <div class="seg" role="group" aria-label="Rentang">${[7, 14, 30].map(n => `<button type="button" data-act="g-range" data-n="${n}" aria-pressed="${g.range === n}">${n} hari</button>`).join('')}</div>
-      <div class="seg" role="group" aria-label="Dasar">${['plan', 'real'].map(k => `<button type="button" data-act="g-basis" data-b="${k}" aria-pressed="${g.basis === k}">${BASIS_LBL[k]}</button>`).join('')}</div>
-    </div>
-    <section class="card">
+  const mainCard = isAll ? `    <section class="card">
+      <div class="card-head"><div><h3>Semua karyawan · total jam kerja per hari</h3><p class="muted small">${g.range} hari terakhir, berdasarkan ${BASIS_LBL[g.basis].toLowerCase()}. Satu garis per karyawan; titik di atas garis jam normal = estimasi lembur.</p></div>
+        <div class="head-stat"><div class="faint tiny">Rata-rata / orang / hari</div><div style="font-weight:800;font-size:20px">${allOk.length ? fmtDur(allAvg) : '–'}</div></div></div>
+      <div class="legend">${empLegendHtml(lines)}</div>
+      <div class="chart" id="ch-main"></div>
+    </section>
+` : `    <section class="card">
       <div class="card-head"><div><h3>${esc(selU.nama)} · total jam kerja per hari</h3><p class="muted small">${g.range} hari terakhir, berdasarkan ${BASIS_LBL[g.basis].toLowerCase()}. Bagian di atas garis jam normal = estimasi lembur.</p></div>
-        <div style="text-align:right"><div class="faint tiny">Rata-rata / hari</div><div style="font-weight:800;font-size:20px">${okDays.length ? fmtDur(sum('total') / okDays.length) : '–'}</div></div></div>
+        <div class="head-stat"><div class="faint tiny">Rata-rata / hari</div><div style="font-weight:800;font-size:20px">${okDays.length ? fmtDur(sum('total') / okDays.length) : '–'}</div></div></div>
       <div class="legend">${legendHtml()}</div>
       <div class="chart" id="ch-main"></div>
     </section>
+`;
+  const dayRows = all[0].map((_, k) => all[0].length - 1 - k).map(k => { const ds = all.map(s => s[k]), ok = ds.filter(d => d.ok);
+    return `<tr><td>${esc(fmtDateMed(all[0][k].date))}</td>${ds.map(d => d.ok ? `<td class="num ${d.ot ? 'ot' : ''}"><b>${fmtDur(d.total)}</b></td>` : '<td class="num faint">–</td>').join('')}<td class="num">${ok.length ? fmtDur(ok.reduce((a, d) => a + d.total, 0) / ok.length) : '–'}</td></tr>`; }).join('');
+  const tableCard = isAll ? `    <section class="card">
+      <h3 style="margin-bottom:4px">Tabel harian · semua karyawan</h3><p class="muted small" style="margin-bottom:10px">Total jam kerja per orang per hari. Sel kuning = di atas jam normal (ada estimasi lembur).</p>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tanggal</th>${lines.map(l => `<th class="num"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${l.color};margin-right:5px"></i>${esc(l.label)}</th>`).join('')}<th class="num">Rata-rata</th></tr></thead><tbody>
+        ${dayRows}
+        <tr><td><b>Rata-rata</b></td>${cmp.map(r => `<td class="num"><b>${r.value ? fmtDur(r.value) : '–'}</b></td>`).join('')}<td class="num"><b>${allOk.length ? fmtDur(allAvg) : '–'}</b></td></tr>
+      </tbody></table></div>
+    </section>
+` : `    <section class="card">
+      <h3 style="margin-bottom:10px">Tabel harian · ${esc(selU.nama)}</h3>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tanggal</th><th class="num">Produktif</th><th class="num">Tidak efektif</th><th class="num">Istirahat</th><th class="num">Total</th><th class="num">Estimasi lembur</th></tr></thead><tbody>
+        ${sel.slice().reverse().map(d => `<tr><td>${esc(fmtDateMed(d.date))}</td>${d.ok ? `<td class="num">${fmtDur(d.segs[0])}</td><td class="num">${fmtDur(d.segs[1])}</td><td class="num">${fmtDur(d.segs[2])}</td><td class="num"><b>${fmtDur(d.total)}</b></td><td class="num">${d.ot ? `<span class="chip warn">${I.clock}${fmtDur(d.ot)}</span>` : '0'}</td>` : '<td class="faint" colspan="5">tidak ada data</td>'}</tr>`).join('')}
+        ${okDays.length ? `<tr><td><b>Total ${okDays.length} hari</b></td><td class="num"><b>${fmtDur(sum(0))}</b></td><td class="num"><b>${fmtDur(sum(1))}</b></td><td class="num"><b>${fmtDur(sum(2))}</b></td><td class="num"><b>${fmtDur(sum('total'))}</b></td><td class="num"><b>${fmtDur(sum('ot'))}</b></td></tr>` : ''}
+      </tbody></table></div>
+    </section>
+`;
+  main.innerHTML = `<div class="toolbar">
+      <div class="datelabel">Grafik jam kerja</div>
+      <button type="button" class="btn sm" data-act="report-open">${I.dl} Cetak / PDF</button>
+      <label class="seg-label" for="g-uid">Karyawan</label><select id="g-uid" class="inp sm" style="width:auto" data-chg="g-uid"><option value="all" ${isAll ? 'selected' : ''}>Semua karyawan</option>${emps.map(u => `<option value="${u.id}" ${u.id === g.uid ? 'selected' : ''}>${esc(u.nama)}</option>`).join('')}</select>
+      <div class="seg" role="group" aria-label="Rentang">${[7, 14, 30].map(n => `<button type="button" data-act="g-range" data-n="${n}" aria-pressed="${g.range === n}">${n} hari</button>`).join('')}</div>
+      <div class="seg" role="group" aria-label="Dasar">${['plan', 'real'].map(k => `<button type="button" data-act="g-basis" data-b="${k}" aria-pressed="${g.basis === k}">${BASIS_LBL[k]}</button>`).join('')}</div>
+    </div>
+${mainCard}
     <section class="card">
       <div class="card-head"><div><h3>Perbandingan antar karyawan</h3><p class="muted small">Rata-rata total jam per hari kerja (hari yang ada datanya), ${g.range} hari terakhir.</p></div></div>
       <div class="chart" id="ch-cmp"></div>
       <div class="tbl-wrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>Karyawan</th><th class="num">Hari ada data</th><th class="num">Rata-rata / hari</th><th class="num">Hari lembur</th><th class="num">Total estimasi lembur</th></tr></thead><tbody>
         ${cmp.map(r => `<tr><td><b>${esc(r.label)}</b></td><td class="num">${r.days}</td><td class="num">${r.value ? fmtDur(r.value) : '–'}</td><td class="num">${r.otDays}</td><td class="num">${r.ot ? fmtDur(r.ot) : '0'}</td></tr>`).join('')}</tbody></table></div>
     </section>
-    <section class="card">
-      <h3 style="margin-bottom:10px">Tabel harian · ${esc(selU.nama)}</h3>
-      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tanggal</th><th class="num">Produktif</th><th class="num">Tidak efektif</th><th class="num">Istirahat</th><th class="num">Total</th><th class="num">Estimasi lembur</th></tr></thead><tbody>
-        ${sel.slice().reverse().map(d => `<tr><td>${esc(fmtDateMed(d.date))}</td>${d.ok ? `<td class="num">${fmtDur(d.segs[0])}</td><td class="num">${fmtDur(d.segs[1])}</td><td class="num">${fmtDur(d.segs[2])}</td><td class="num"><b>${fmtDur(d.total)}</b></td><td class="num">${d.ot ? `<span class="chip warn">${I.clock}${fmtDur(d.ot)}</span>` : '0'}</td>` : '<td class="faint" colspan="5">tidak ada data</td>'}</tr>`).join('')}
-        ${okDays.length ? `<tr><td><b>Total ${okDays.length} hari</b></td><td class="num"><b>${fmtDur(sum(0))}</b></td><td class="num"><b>${fmtDur(sum(1))}</b></td><td class="num"><b>${fmtDur(sum(2))}</b></td><td class="num"><b>${fmtDur(sum('total'))}</b></td><td class="num"><b>${fmtDur(sum('ot'))}</b></td></tr>` : ''}
-      </tbody></table></div>
-    </section>`;
+${tableCard}`;
   const c1 = $('#ch-main'), c2 = $('#ch-cmp');
-  registerChart(c1, () => drawStacked(c1, sel, { h: 280 }));
+  registerChart(c1, () => isAll ? drawMultiLine(c1, lines, { h: 300 }) : drawStacked(c1, sel, { h: 280 }));
   registerChart(c2, () => drawHBars(c2, cmp));
 }
 CHG['g-uid'] = el => { S.spv.g.uid = el.value; renderSpvTab(); };
@@ -1413,7 +1520,97 @@ ACT['export'] = async el => {
   if (rows.length === 1) return toast('Tidak ada data di rentang ini');
   await saveFile(`daily-task-${el.dataset.kind === 'detail' ? 'detail' : 'ringkasan'}_${from}_${to}.csv`, csv(rows));
 };
-/* ---------- 12. START ---------- */
+/* ---------- 12. LAPORAN CETAK / PDF ---------- */
+const daysBetween = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 864e5) + 1;
+ACT['report-open'] = () => {
+  const to0 = todayStr();
+  openModal({ title: 'Cetak / simpan PDF', sheet: true,
+    body: `<div class="stack">
+      <p class="muted small">Laporan perbandingan semua karyawan dalam satu file. Setelah laporan terbuka, tekan <b>Cetak / Simpan PDF</b>, lalu pilih <b>Save as PDF</b> (Simpan sebagai PDF) di jendela cetak.</p>
+      <div class="row" style="gap:6px;flex-wrap:wrap">${[7, 14, 30].map(n => `<button type="button" class="chip-btn" data-rq="${n}">${n} hari terakhir</button>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="field">Dari<input class="inp" type="date" id="rp-from" value="${addDays(to0, -6)}"></label><label class="field">Sampai<input class="inp" type="date" id="rp-to" value="${to0}"></label></div>
+      <label class="field">Dasar grafik & lembur<select class="inp" id="rp-basis"><option value="plan">Rencana (pagi)</option><option value="real">Realisasi (sore)</option></select></label>
+      <label class="chk"><input type="checkbox" id="rp-prod" checked> Rincian produk per karyawan</label>
+      <label class="chk"><input type="checkbox" id="rp-notes" checked> Keterangan dari karyawan</label>
+      <p class="err" hidden></p></div>`,
+    actions: [{ label: 'Batal', cls: 'ghost' }, { label: 'Buat laporan', cls: 'primary', onClick: m => {
+      const from = $('#rp-from', m).value, to = $('#rp-to', m).value, er = $('.err', m), bad = t => { er.textContent = t; er.hidden = false; return false; };
+      if (!from || !to || from > to) return bad('Rentang tanggal tidak valid.');
+      if (daysBetween(from, to) > 62) return bad('Maksimal 62 hari per laporan.');
+      buildReport({ from, to, basis: $('#rp-basis', m).value, prod: $('#rp-prod', m).checked, notes: $('#rp-notes', m).checked });
+    } }],
+    onOpen: m => { $('#rp-basis', m).value = S.spv.g.basis || 'plan';
+      m.addEventListener('click', e => { const q = e.target.closest('[data-rq]'); if (q) { $('#rp-to', m).value = todayStr(); $('#rp-from', m).value = addDays(todayStr(), -(+q.dataset.rq - 1)); } }); } });
+};
+ACT['report-print'] = () => { try { window.print(); } catch (e) { toast('Browser ini tidak bisa mencetak dari sini'); } };
+ACT['report-close'] = () => { document.body.classList.remove('reporting'); const r = $('#report-root'); if (r) r.innerHTML = ''; };
+async function buildReport(o) {
+  let root = $('#report-root');
+  if (!root) { root = document.createElement('div'); root.id = 'report-root'; document.body.appendChild(root); }
+  document.body.classList.add('reporting'); hideTip(); root.scrollTop = 0;
+  root.innerHTML = `<div class="rep-bar"><span class="grow small muted" id="rp-status">Menyiapkan laporan…</span><button type="button" class="btn" data-act="report-close">Tutup</button></div>`;
+  let rm; try { rm = await withTimeout(rangeMap(o.from, o.to), 40000); } catch (e) { rm = null; }
+  if (!rm) { $('#rp-status').textContent = 'Data belum bisa dijangkau. Tutup lalu coba lagi.'; return; }
+  const emps = karyawanList(), n = daysBetween(o.from, o.to), dates = Array.from({ length: n }, (_, i) => addDays(o.from, i));
+  const ser = b => emps.map(u => seriesFrom(rm, u.id, o.to, n, b));
+  const sb = ser(o.basis), sp = o.basis === 'plan' ? sb : ser('plan'), sr = o.basis === 'real' ? sb : ser('real');
+  const avgOf = ds => { const ok = ds.filter(d => d.ok); return ok.length ? ok.reduce((a, d) => a + d.total, 0) / ok.length : 0; };
+  const stats = emps.map((u, i) => {
+    const ents = dates.map(d => rm.get(`${d}_${u.id}`)).filter(Boolean);
+    const done = ents.filter(e => e.status === 'done'), prod = new Map();
+    let pcsPlan = 0, pcsReal = 0, pcsExtra = 0;
+    done.forEach(e => e.items.forEach(it => {
+      const q = it.extra ? 0 : +it.qty || 0, r = +it.qtyReal || 0;
+      if (it.extra) pcsExtra += r; else { pcsPlan += q; pcsReal += r; }
+      const x = prod.get(it.pid) || { plan: 0, real: 0, extra: 0 }; x.plan += q; if (it.extra) x.extra += r; else x.real += r; prod.set(it.pid, x);
+    }));
+    const okB = sb[i].filter(d => d.ok);
+    return { u, color: empColor(u.id), planDays: ents.filter(e => e.status !== 'draft').length, doneDays: done.length,
+      pcsPlan, pcsReal, pcsExtra, pct: pcsPlan ? Math.round(pcsReal / pcsPlan * 100) : null,
+      avgPlan: avgOf(sp[i]), avgReal: avgOf(sr[i]), avgB: avgOf(sb[i]), okDays: okB.length,
+      otDays: okB.filter(d => d.ot > 0).length, ot: okB.reduce((a, d) => a + d.ot, 0), prod,
+      notes: done.filter(e => e.note).map(e => ({ date: e.date, note: e.note })) };
+  });
+  const lines = emps.map((u, i) => ({ id: u.id, label: firstName(u.nama), color: empColor(u.id), days: sb[i] }));
+  const cmp = stats.map(s => ({ label: firstName(s.u.nama), value: s.avgB, days: s.okDays, otDays: s.otDays, ot: s.ot, color: s.color }));
+  const st = D.settings, BL = BASIS_LBL[o.basis].toLowerCase(), now = new Date();
+  const sw = c => `<i class="sw" style="background:${c}"></i>`;
+  const pctTxt = p => p == null ? '–' : `<b class="${p >= 100 ? 'good' : p >= 80 ? 'warn' : 'crit'}">${p}%</b>`;
+  const dayRows = dates.map((d, k) => ({ d, ds: sb.map(s => s[k]) })).filter(r => r.ds.some(x => x.ok));
+  const notes = stats.flatMap(s => s.notes.map(x => ({ ...x, nama: s.u.nama, color: s.color }))).sort((a, b) => a.date.localeCompare(b.date) || a.nama.localeCompare(b.nama));
+  root.innerHTML = `<div class="rep-bar"><span class="grow small"><b>Pratinjau laporan.</b> Tekan Cetak, lalu pilih “Save as PDF”.</span>
+      <button type="button" class="btn" data-act="report-close">Tutup</button><button type="button" class="btn primary" data-act="report-print">${I.dl} Cetak / Simpan PDF</button></div>
+    <div class="rep-page rep">
+      <header class="rep-head">
+        <div class="row" style="gap:16px;align-items:center"><img src="${LOGO}" alt="Joybox" style="height:36px;width:auto">
+          <div><h1>Laporan Workload Tim Produksi</h1><p class="muted small">${esc(fmtDateLong(o.from))} – ${esc(fmtDateLong(o.to))} · ${n} hari · grafik & lembur berdasarkan <b>${BL}</b></p></div></div>
+        <div class="small muted" style="text-align:right;white-space:nowrap">Dibuat ${esc(fmtDateMed(todayStr()))}, ${fmtTime(now.toISOString())}<br>oleh ${esc(S.user.nama)}</div>
+      </header>
+      <section class="rep-sec"><h2>Ringkasan per karyawan</h2>
+        <table class="rtbl"><thead><tr><th>Karyawan</th><th class="num">Hari isi rencana</th><th class="num">Hari lengkap</th><th class="num">Pcs rencana</th><th class="num">Pcs jadi</th><th class="num">Capaian</th><th class="num">Tambahan (pcs)</th><th class="num">Rata-rata jam/hari (rencana)</th><th class="num">Rata-rata jam/hari (realisasi)</th><th class="num">Hari lembur</th><th class="num">Total estimasi lembur</th></tr></thead>
+        <tbody>${stats.map(s => `<tr><td>${sw(s.color)}<b>${esc(s.u.nama)}</b></td><td class="num">${s.planDays}</td><td class="num">${s.doneDays}</td><td class="num">${fmtNum(s.pcsPlan)}</td><td class="num">${fmtNum(s.pcsReal)}</td><td class="num">${pctTxt(s.pct)}</td><td class="num">${s.pcsExtra ? fmtNum(s.pcsExtra) : '–'}</td><td class="num">${s.avgPlan ? fmtDur(s.avgPlan) : '–'}</td><td class="num">${s.avgReal ? fmtDur(s.avgReal) : '–'}</td><td class="num">${s.otDays}</td><td class="num"><b>${s.ot ? fmtDur(s.ot) : '0'}</b></td></tr>`).join('')}</tbody></table>
+        <p class="rep-note">Pcs dan capaian dihitung dari hari lengkap (realisasi sudah dikirim). Jam kerja = standar waktu × qty ÷ efektivitas ${st.efektivitas}% + istirahat ${st.istirahatMenit} mnt. Jam normal ${st.jamNormal} jam (termasuk istirahat); kelebihannya = estimasi hak lembur, berdasarkan ${BL}.</p></section>
+      <section class="rep-sec"><h2>Total jam kerja per hari · ${BL}</h2><div class="legend">${empLegendHtml(lines)}</div><div class="chart" id="rp-line"></div></section>
+      <section class="rep-sec"><h2>Rata-rata total jam per hari kerja · ${BL}</h2><div class="chart" id="rp-bars"></div></section>
+      <section class="rep-sec"><h2>Tabel harian · ${BL}</h2>
+        ${dayRows.length ? `<table class="rtbl"><thead><tr><th>Tanggal</th>${lines.map(l => `<th class="num">${sw(l.color)}${esc(l.label)}</th>`).join('')}<th class="num">Rata-rata</th></tr></thead><tbody>
+          ${dayRows.map(r => { const ok = r.ds.filter(x => x.ok); return `<tr><td>${esc(fmtDateMed(r.d))}</td>${r.ds.map(x => x.ok ? `<td class="num ${x.ot ? 'ot' : ''}">${fmtDur(x.total)}${x.ot ? `<small>+${fmtDur(x.ot)}</small>` : ''}</td>` : '<td class="num faint">–</td>').join('')}<td class="num">${fmtDur(ok.reduce((a, x) => a + x.total, 0) / ok.length)}</td></tr>`; }).join('')}
+          <tr class="tot"><td>Rata-rata</td>${stats.map(s => `<td class="num">${s.avgB ? fmtDur(s.avgB) : '–'}</td>`).join('')}<td class="num">${(() => { const ok = sb.flat().filter(x => x.ok); return ok.length ? fmtDur(ok.reduce((a, x) => a + x.total, 0) / ok.length) : '–'; })()}</td></tr>
+        </tbody></table><p class="rep-note">Sel berwarna = di atas jam normal; angka kecil = estimasi lembur. Hari tanpa data tidak ditampilkan.</p>` : '<p class="muted small">Belum ada data pada periode ini.</p>'}
+      </section>
+      ${o.prod ? `<section class="rep-sec"><h2>Rincian produk per karyawan · hari lengkap</h2><div class="rep-grid">${stats.map(s => {
+        const rows = [...s.prod.entries()].map(([pid, x]) => ({ p: D.pmap.get(pid) || { nama: '(produk dihapus)', sku: '' }, ...x })).sort((a, b) => (b.plan + b.extra) - (a.plan + a.extra));
+        return `<div class="rep-card"><h3>${sw(s.color)}${esc(s.u.nama)}</h3>${rows.length ? `<table class="rtbl"><thead><tr><th>Produk</th><th class="num">Rencana</th><th class="num">Jadi</th><th class="num">Capaian</th></tr></thead><tbody>
+          ${rows.map(r => `<tr><td>${esc(r.p.nama)} <span class="sku">${esc(r.p.sku)}</span></td><td class="num">${r.plan ? fmtNum(r.plan) : '–'}</td><td class="num">${fmtNum(r.real + r.extra)}${r.extra ? '<small>tambahan</small>' : ''}</td><td class="num">${r.plan ? pctTxt(Math.round(r.real / r.plan * 100)) : '–'}</td></tr>`).join('')}</tbody></table>` : '<p class="muted small">Belum ada hari lengkap.</p>'}</div>`; }).join('')}</div></section>` : ''}
+      ${o.notes ? `<section class="rep-sec"><h2>Keterangan dari karyawan</h2>${notes.length ? `<table class="rtbl"><thead><tr><th style="width:120px">Tanggal</th><th style="width:140px">Karyawan</th><th>Keterangan</th></tr></thead><tbody>
+          ${notes.map(x => `<tr><td>${esc(fmtDateMed(x.date))}</td><td>${sw(x.color)}${esc(x.nama)}</td><td class="note-text">${esc(x.note)}</td></tr>`).join('')}</tbody></table>` : '<p class="muted small">Tidak ada keterangan pada periode ini.</p>'}</section>` : ''}
+      <p class="rep-foot">Daily Task Produksi · Joybox</p>
+    </div>`;
+  drawMultiLine($('#rp-line'), lines, { h: 300, w: 1000 });
+  drawHBars($('#rp-bars'), cmp, { w: 1000 });
+}
+
+/* ---------- 13. START ---------- */
 function blocker(title, body) {
   app().innerHTML = `<div class="login"><div class="card login-card" style="text-align:center">
     <div class="login-brand"><img src="${LOGO}" alt="Joybox"><p>Daily Task Produksi</p></div>
